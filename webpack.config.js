@@ -47,12 +47,26 @@ module.exports = {
   entry: {
     // The frontend.entrypoint points to the HTML file for this build, so we need
     // to replace the extension to `.js`.
-    index: path.join(__dirname, frontend_entry).replace(/\.html$/, ".js"),
+    index: path.join(__dirname, frontend_entry).replace(/\.html$/, '.tsx'),
   },
   devtool: isDevelopment ? "source-map" : false,
   optimization: {
     minimize: !isDevelopment,
     minimizer: [new TerserPlugin()],
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(ts|js)x?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
+          },
+        },
+      },
+    ],
   },
   resolve: {
     extensions: [".js", ".ts", ".jsx", ".tsx"],
@@ -62,6 +76,10 @@ module.exports = {
       events: require.resolve("events/"),
       stream: require.resolve("stream-browserify/"),
       util: require.resolve("util/"),
+    },
+    alias: {
+      ['blogfe']: path.resolve(__dirname, 'src/blog_frontend/src'),
+      ['declarations']: path.resolve(__dirname, 'src/declarations'),
     },
   },
   output: {
